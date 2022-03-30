@@ -20,5 +20,6 @@ transformers = [
 ]
 ct = ColumnTransformer(transformers, remainder='passthrough')
 ct.fit(X) # passiamo i dati da trasformare
-X = ct.transform() # trasforma i dati passati
+X = ct.transform(X) # trasforma i dati passati
 # si può scrivere anche così direttamente X = ct.fit_trasform(X) 
+print(X)
