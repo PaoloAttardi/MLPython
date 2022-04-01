@@ -7,8 +7,6 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
-from validation2 import X_train
-
 dataset = load_wine()
 
 # vediamo il confronto tra magnesio, con deviazione standard alta, rispetto ai fenoli con deviazione standard molto minore
