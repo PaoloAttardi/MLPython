@@ -12,7 +12,7 @@ def string_to_milliseconds(string):
     miliseconds = int(3600000 * hours + 60000 * minutes + 1000 * seconds)
     return miliseconds
 
-df = pd.read_csv('Lap_project/Laps_time.csv', sep=';')
+df = pd.read_csv('Lap_project/Laps_time.csv', sep=';', header=1)
 
 lap_time_milliseconds = []
 
@@ -23,6 +23,7 @@ df['lap_time_milliseconds'] = lap_time_milliseconds
 
 # sns.relplot(data=df, x='lap_time_milliseconds', y='Qualità_giro', kind='line')
 
-sns.relplot(data=df, x='Consumo_gomme', y='lap_time_milliseconds', col='Gomme', kind='line')
+sns.relplot(data=df, x='Consumo_gomme', y='lap_time_milliseconds', hue='Stint', col='Gomme')
 
+plt.gca().invert_xaxis()
 plt.show()
