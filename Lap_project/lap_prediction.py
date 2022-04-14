@@ -4,6 +4,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.compose import ColumnTransformer
+import pickle
 
 def string_to_milliseconds(string):
     hours, minutes, seconds = (["0", "0"] + string.split(":"))[-3:]
@@ -38,7 +39,18 @@ X = ct.fit_transform(df)
 X_train, X_test, y_train, y_test = train_test_split(X, y)
 
 model = LinearRegression()
+
+"""
 model.fit(X_train, y_train)
+
+# si usa pickle per salvare i modello su un file pickle, una volta salvato non servirà più l'addestramento o la sovracrittura del modello
+# a meno di volerlo aggiornare ad ogni nhuova aggiunta di dati in un altro script
+
+with open('lapmodel.pickle', 'wb') as f:
+    pickle.dump(model, f)
+"""
+pickle_in = open('lapmodel.pickle', 'rb')
+model = pickle.load(pickle_in)
 
 p_train = model.predict(X_train)
 p_test = model.predict(X_test)
