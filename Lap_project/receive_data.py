@@ -1,37 +1,85 @@
 import socket
+import csv
 from threading import Thread
-
 from f1_2020_telemetry.packets import unpack_udp_packet
 
-def switch(packet_id):
-    if packet_id == 1 and session:
-        print(Packet_Value1)
-    elif packet_id == 2:
-        print(Packet_Value2)
-    elif packet_id == 5:
-        print(Packet_Value3)
+Packet_Value1 = (1, 'Session')
+Packet_Value2 = (2, 'LapData') # ultimo giro con i settori un po' un casino, seleziona solo una macchina
+Packet_Value3 = (5, 'CarSetups') # tipo tutto seleziona solo una macchina
+Packet_Value4 = (6, 'CarStatusPacket') # benza e consumo gomme
+header = ['weather', 'trackTemperaure', 'airTemperature']
+playerCarId = None
 
-switch(61)
+def switch(packet_id, packet):
+    if packet_id == 1:
+        GetSessionData(packet)
+    elif packet_id == 2:
+        GetLapData(packet)
+    elif packet_id == 5:
+        GetCarSetup(packet)
+    elif packet_id == 6:
+        GetCarStatus(packet)
 
 def GetData():
     check = True
+    hostname = socket.gethostname()    
+    IPAddr = socket.gethostbyname(hostname)  
+    UDP_PORT = 20777
+    udp_socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
+    udp_socket.bind((IPAddr, UDP_PORT))
     while check:
         udp_packet = udp_socket.recv(2048)
         packet = unpack_udp_packet(udp_packet)
         header = packet.header
-        switch(header.packetId)
+        global playerCarId
+        playerCarId = header.playerCarIndex
+        switch(header.packetId,packet)
 
-Packet_Value1 = (1, 'Session')
-Packet_Value2 = (2, 'LapData')
-Packet_Value3 = (5, 'CarSetups')
+def GetSessionData(packet):
+    # packet = packet.PacketSessionData controlla come accedere al ai dati della sessione
+    weather = packet.weather
+    trackTemperature = packet.trackTemperature
+    airTemperature = packet.airTemperature
+    sessionUID = packet.header.sessionUID
+    sessionData = [sessionUID, weather, trackTemperature, airTemperature]
+    print('sessionData: ', sessionData)
 
-hostname = socket.gethostname()    
-IPAddr = socket.gethostbyname(hostname)  
-UDP_PORT = 20777
-udp_socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
-udp_socket.bind((IPAddr, UDP_PORT))
+def GetCarSetup(packet):
+    myCar = packet.carSetups[playerCarId]
+    frontWing = myCar.frontWing
+    rearWing = myCar.rearWing
+    ballast = myCar.ballast
+    fuelLoad = myCar.fuelLoad
+    brakePressure = myCar.brakePressure
+    brakeBias = myCar.brakeBias
+    carSetupData = [frontWing, rearWing, ballast, fuelLoad, brakePressure, brakeBias]
+    print('Setup: ', carSetupData)
 
-session = (True)
+def GetCarStatus(packet):
+    myCar = packet.carStatusData[playerCarId]
+    fuelMix = myCar.fuelMix
+    fuelInTank = myCar.fuelInTank
+    tyresWear = myCar.tyresWear # array di 4 elementi
+    actualTyreCompound = myCar.actualTyreCompound
+    tyresAgeLaps = myCar.tyresAgeLaps
+    carStatusData = [fuelMix, fuelInTank, tyresWear, actualTyreCompound, tyresAgeLaps]
+    print('carStatus: ', carStatusData)
+    """
+    with open('MLPython/Lap_project/Lap_time.csv', 'w', encoding='UTF8', newline='') as f:
+        writer = csv.writer(f)
+
+        # write the header
+        writer.writerow(header)
+
+        # write the data
+        writer.writerow(data)
+    """
+def GetLapData(packet):
+    myCar = packet.lapData[playerCarId]
+    lastLapTime = myCar.lastLapTime
+    currentLapNum = myCar.currentLapNum
+    lapData = [lastLapTime, currentLapNum]
+    print('lapData: ', lapData)
 
 """
 The Thread() accepts many parameters. The main ones are:
