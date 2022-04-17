@@ -1,24 +1,27 @@
 import socket
 import csv
+import numpy as np
 from threading import Thread
 from f1_2020_telemetry.packets import unpack_udp_packet
 
-Packet_Value1 = (1, 'Session')
-Packet_Value2 = (2, 'LapData') # ultimo giro con i settori un po' un casino, seleziona solo una macchina
-Packet_Value3 = (5, 'CarSetups') # tipo tutto seleziona solo una macchina
-Packet_Value4 = (6, 'CarStatusPacket') # benza e consumo gomme
-header = ['weather', 'trackTemperaure', 'airTemperature']
+header = ['sessionUID','trackId','sessionType','weather','trackTemperaure','airTemperature', # sessionData
+'frontWing', 'rearWing', 'ballast', 'brakePressure', 'brakeBias', # carSetup
+'fuelMix', 'fuelInTank', 'tyresWear', 'actualTyreCompound', 'tyresAgeLaps', # carStatus
+'lastLapTime', 'currentLapNum' # lapData
+]
 playerCarId = None
+lastLapNum = 1
+data = ['sessionData','carSetup','carStatus','lapData']
 
 def switch(packet_id, packet):
     if packet_id == 1:
-        GetSessionData(packet)
+        data[0] = GetSessionData(packet)
     elif packet_id == 2:
         GetLapData(packet)
     elif packet_id == 5:
-        GetCarSetup(packet)
-    elif packet_id == 6:
-        GetCarStatus(packet)
+        data[1] = GetCarSetup(packet)
+    elif packet_id == 7:
+        data[2] = GetCarStatus(packet)
 
 def GetData():
     check = True
@@ -38,33 +41,61 @@ def GetData():
 def GetSessionData(packet):
     # packet = packet.PacketSessionData controlla come accedere al ai dati della sessione
     weather = packet.weather
+    trackId = packet.trackId
+    sessionType = packet.sessionType
     trackTemperature = packet.trackTemperature
     airTemperature = packet.airTemperature
     sessionUID = packet.header.sessionUID
-    sessionData = [sessionUID, weather, trackTemperature, airTemperature]
-    print('sessionData: ', sessionData)
+    sessionData = [sessionUID, trackId, sessionType, weather, trackTemperature, airTemperature]
+    return sessionData
 
 def GetCarSetup(packet):
     myCar = packet.carSetups[playerCarId]
     frontWing = myCar.frontWing
     rearWing = myCar.rearWing
     ballast = myCar.ballast
-    fuelLoad = myCar.fuelLoad
     brakePressure = myCar.brakePressure
     brakeBias = myCar.brakeBias
-    carSetupData = [frontWing, rearWing, ballast, fuelLoad, brakePressure, brakeBias]
-    print('Setup: ', carSetupData)
+    carSetupData = [frontWing, rearWing, ballast, brakePressure, brakeBias]
+    return carSetupData
 
 def GetCarStatus(packet):
     myCar = packet.carStatusData[playerCarId]
     fuelMix = myCar.fuelMix
     fuelInTank = myCar.fuelInTank
     tyresWear = myCar.tyresWear # array di 4 elementi
+    tyresWear = np.sum(tyresWear)/4 # General Wear
     actualTyreCompound = myCar.actualTyreCompound
     tyresAgeLaps = myCar.tyresAgeLaps
+    if(tyresAgeLaps == 0): tyresAgeLaps += 1
     carStatusData = [fuelMix, fuelInTank, tyresWear, actualTyreCompound, tyresAgeLaps]
-    print('carStatus: ', carStatusData)
-    """
+    return carStatusData
+
+def GetLapData(packet):
+    myCar = packet.lapData[playerCarId]
+    lastLapTime = myCar.lastLapTime
+    currentLapNum = myCar.currentLapNum
+    global lastLapNum
+    if(currentLapNum > lastLapNum):
+        global data
+        lastLapNum = currentLapNum
+        lapData = [lastLapTime, currentLapNum]
+        data[3] = lapData
+        write_data_thread = Thread(target=WriteData,args=(data,))
+        write_data_thread.start()
+
+def WriteData(data):
+    lapData = []
+    with open('MLPython/Lap_project/Lap_time.csv') as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        line_count = 0
+        for row in csv_reader:
+            if line_count != 0:
+                lapData.append(row)
+                line_count += 1
+            else:
+                line_count += 1
+    lapData.append(data[0] + data[1] + data[2] + data[3])
     with open('MLPython/Lap_project/Lap_time.csv', 'w', encoding='UTF8', newline='') as f:
         writer = csv.writer(f)
 
@@ -72,14 +103,7 @@ def GetCarStatus(packet):
         writer.writerow(header)
 
         # write the data
-        writer.writerow(data)
-    """
-def GetLapData(packet):
-    myCar = packet.lapData[playerCarId]
-    lastLapTime = myCar.lastLapTime
-    currentLapNum = myCar.currentLapNum
-    lapData = [lastLapTime, currentLapNum]
-    print('lapData: ', lapData)
+        writer.writerows(lapData)
 
 """
 The Thread() accepts many parameters. The main ones are:
@@ -91,6 +115,4 @@ creo un nuovo thread per ricevere i dati
 """
 
 get_data_thread = Thread(target=GetData)
-# write_data_thread = Thread(target=WriteData,args=)
 get_data_thread.start()
-get_data_thread.join() # aspetta che ricevi i dati prima di continuare nell'esecuzione del programma (scrittura)
