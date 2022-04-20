@@ -5,7 +5,9 @@ from threading import Thread
 from f1_2020_telemetry.packets import unpack_udp_packet
 
 header = ['sessionUID','trackId','sessionType','weather','trackTemperaure','airTemperature', # sessionData
-'frontWing', 'rearWing', 'ballast', 'brakePressure', 'brakeBias', # carSetup
+'frontWing', 'rearWing', 'onThrottle', 'offThrottle', 'frontCamber', 'rearCamber', 'frontToe', 'rearToe', 'frontSuspension',
+'rearSuspension', 'frontAntiRollBar', 'rearAntiRollBar', 'frontSuspensionHeight', 'rearSuspensionHeight', 'rearLeftTyrePressure', 'rearRightTyrePressure',
+'frontLeftTyrePressure', 'frontRightTyrePressure', 'ballast', 'brakePressure', 'brakeBias', # carSetup
 'fuelMix', 'fuelInTank', 'tyresWear', 'actualTyreCompound', 'tyresAgeLaps', # carStatus
 'lastLapTime', 'currentLapNum' # lapData
 ]
@@ -24,13 +26,15 @@ def switch(packet_id, packet):
         data[2] = GetCarStatus(packet)
 
 def GetData():
-    check = True
     hostname = socket.gethostname()    
     IPAddr = socket.gethostbyname(hostname)  
     UDP_PORT = 20777
     udp_socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
     udp_socket.bind((IPAddr, UDP_PORT))
-    while check:
+    while True:
+        global stop_threads
+        if stop_threads:
+            break
         udp_packet = udp_socket.recv(2048)
         packet = unpack_udp_packet(udp_packet)
         header = packet.header
@@ -53,10 +57,28 @@ def GetCarSetup(packet):
     myCar = packet.carSetups[playerCarId]
     frontWing = myCar.frontWing
     rearWing = myCar.rearWing
+    onThrottle = myCar.onThrottle
+    offThrottle = myCar.offThrottle
+    frontCamber = myCar.frontCamber
+    rearCamber = myCar.rearCamber
+    frontToe = myCar.frontToe
+    rearToe = myCar.rearToe
+    frontSuspension = myCar.frontSuspension
+    rearSuspension = myCar.rearSuspension
+    frontAntiRollBar = myCar.frontAntiRollBar
+    rearAntiRollBar = myCar.rearAntiRollBar
+    frontSuspensionHeight = myCar.frontSuspensionHeight
+    rearSuspensionHeight = myCar.rearSuspensionHeight
+    rearLeftTyrePressure = myCar.rearLeftTyrePressure
+    rearRightTyrePressure = myCar.rearRightTyrePressure
+    frontLeftTyrePressure = myCar.frontLeftTyrePressure
+    frontRightTyrePressure = myCar.frontRightTyrePressure
     ballast = myCar.ballast
     brakePressure = myCar.brakePressure
     brakeBias = myCar.brakeBias
-    carSetupData = [frontWing, rearWing, ballast, brakePressure, brakeBias]
+    carSetupData = [frontWing, rearWing, onThrottle, offThrottle, frontCamber, rearCamber, frontToe, rearToe, frontSuspension,
+    rearSuspension, frontAntiRollBar, rearAntiRollBar, frontSuspensionHeight, rearSuspensionHeight, rearLeftTyrePressure, rearRightTyrePressure,
+    frontLeftTyrePressure, frontRightTyrePressure, ballast, brakePressure, brakeBias]
     return carSetupData
 
 def GetCarStatus(packet):
@@ -104,6 +126,11 @@ def WriteData(data):
 
         # write the data
         writer.writerows(lapData)
+    print('Vuoi continuare a raccogliere dati? y/n: ')
+    input_check = input()
+    if (input_check == 'n'):
+        global stop_threads
+        stop_threads = True
 
 """
 The Thread() accepts many parameters. The main ones are:
@@ -114,5 +141,8 @@ args: specifies the arguments of the function (GetData). The args argument is a 
 creo un nuovo thread per ricevere i dati
 """
 
+stop_threads = False
 get_data_thread = Thread(target=GetData)
 get_data_thread.start()
+get_data_thread.join()
+print('Fine raccolta dati')
