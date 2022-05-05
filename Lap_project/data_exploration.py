@@ -1,9 +1,9 @@
 import pandas as pd
-from pyparsing import line
 import seaborn as sns
 import matplotlib.pyplot as plt
-import numpy as np
+from math import modf
 
+"""
 def string_to_milliseconds(string):
     hours, minutes, seconds = (["0", "0"] + string.split(":"))[-3:]
     hours = int(hours)
@@ -11,19 +11,28 @@ def string_to_milliseconds(string):
     seconds = float(seconds.replace(',', '.'))
     miliseconds = int(3600000 * hours + 60000 * minutes + 1000 * seconds)
     return miliseconds
+"""
 
-df = pd.read_csv('MLPython/Lap_project/Laps_time.csv', sep=';', header=1)
+def secondToLapTime(string):
+    minutes = int(string // 60)
+    fraz,seconds = modf(string - 60 * minutes)
+    fraz = fraz * 100
+    fraz1,milliseconds = modf(fraz)
+    lapTime = str(minutes) + ':' + str(int(seconds)) + '.' + str(int(milliseconds))
+    return lapTime
 
-lap_time_milliseconds = []
-
-for string in df['lap_time']:
-    lap_time_milliseconds.append(string_to_milliseconds(string))
-
-df['lap_time_milliseconds'] = lap_time_milliseconds
+df = pd.read_csv('MLPython/Lap_project/Lap_time.csv')
 
 # sns.relplot(data=df, x='lap_time_milliseconds', y='Qualità_giro', kind='line')
 
-sns.relplot(data=df, x='Consumo_gomme', y='lap_time_milliseconds', hue='Stint', col='Gomme', kind='line')
+result = []
 
-plt.gca().invert_xaxis()
+for lapTime in df['lastLapTime']:
+    result.append(secondToLapTime(lapTime))
+
+df['LapTime'] = result
+sns.relplot(data=df, x='currentLapNum', y='lastLapTime', col='sessionUID', hue='actualTyreCompound', kind='line').fig.suptitle('Laps Time')
+
+sns.relplot(data=df, x='tyresAgeLaps', y='tyresWear', col='actualTyreCompound', kind='line').fig.suptitle('Tyres Wear')
+
 plt.show()

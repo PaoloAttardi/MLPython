@@ -90,6 +90,7 @@ def GetCarStatus(packet):
     actualTyreCompound = myCar.actualTyreCompound
     tyresAgeLaps = myCar.tyresAgeLaps
     if(tyresAgeLaps == 0): tyresAgeLaps += 1
+    elif(tyresAgeLaps == 1): tyresAgeLaps +=1
     carStatusData = [fuelMix, fuelInTank, tyresWear, actualTyreCompound, tyresAgeLaps]
     return carStatusData
 
@@ -117,7 +118,8 @@ def WriteData(data):
                 line_count += 1
             else:
                 line_count += 1
-    lapData.append(data[0] + data[1] + data[2] + data[3])
+    print(data)
+    if(data != None): lapData.append(data[0] + data[1] + data[2] + data[3])
     with open('MLPython/Lap_project/Lap_time.csv', 'w', encoding='UTF8', newline='') as f:
         writer = csv.writer(f)
 
@@ -126,7 +128,9 @@ def WriteData(data):
 
         # write the data
         writer.writerows(lapData)
-    print('Vuoi continuare a raccogliere dati? y/n: ')
+
+def userInput():
+    print('Digita "n" per fermare la raccolta dati: ')
     input_check = input()
     if (input_check == 'n'):
         global stop_threads
@@ -143,6 +147,8 @@ creo un nuovo thread per ricevere i dati
 
 stop_threads = False
 get_data_thread = Thread(target=GetData)
+stop_receive_data = Thread(target=userInput)
 get_data_thread.start()
-get_data_thread.join()
+stop_receive_data.start()
+stop_receive_data.join()
 print('Fine raccolta dati')
