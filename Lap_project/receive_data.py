@@ -89,8 +89,8 @@ def GetCarStatus(packet):
     tyresWear = np.sum(tyresWear)/4 # General Wear
     actualTyreCompound = myCar.actualTyreCompound
     tyresAgeLaps = myCar.tyresAgeLaps
-    if(tyresAgeLaps == 0): tyresAgeLaps += 1
-    elif(tyresAgeLaps == 1): tyresAgeLaps +=1
+    # if(tyresAgeLaps == 0): tyresAgeLaps += 1
+    # elif(tyresAgeLaps == 1): tyresAgeLaps +=1
     carStatusData = [fuelMix, fuelInTank, tyresWear, actualTyreCompound, tyresAgeLaps]
     return carStatusData
 
