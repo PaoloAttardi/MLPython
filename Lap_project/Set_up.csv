@@ -1,0 +1,2 @@
+trackName,frontWing,rearWing,onThrottle,offThrottle,frontCamber,rearCamber,frontToe,rearToe,frontSuspension,rearSuspension,frontAntiRollBar,rearAntiRollBar,frontSuspensionHeight,rearSuspensionHeight,rearLeftTyrePressure,rearRightTyrePressure,frontLeftTyrePressure,frontRightTyrePressure,ballast,brakePressure,brakeBias
+Monza,4,4,70,65,-2.5999999046325684,-1.100000023841858,0.06000000238418579,0.20000000298023224,4,4,5,5,4,5,20.700000762939453,20.700000762939453,21.799999237060547,21.799999237060547,6,100,58

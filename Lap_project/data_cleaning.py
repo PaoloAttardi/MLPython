@@ -1,11 +1,18 @@
 import csv
 
+from pyparsing import empty
+
 header = ['sessionUID','trackName','sessionType','weather','trackTemperaure','airTemperature', # sessionData
-'frontWing', 'rearWing', 'onThrottle', 'offThrottle', 'frontCamber', 'rearCamber', 'frontToe', 'rearToe', 'frontSuspension',
-'rearSuspension', 'frontAntiRollBar', 'rearAntiRollBar', 'frontSuspensionHeight', 'rearSuspensionHeight', 'rearLeftTyrePressure', 'rearRightTyrePressure',
-'frontLeftTyrePressure', 'frontRightTyrePressure', 'ballast', 'brakePressure', 'brakeBias', # carSetup
+# 'frontWing', 'rearWing', 'onThrottle', 'offThrottle', 'frontCamber', 'rearCamber', 'frontToe', 'rearToe', 'frontSuspension',
+# 'rearSuspension', 'frontAntiRollBar', 'rearAntiRollBar', 'frontSuspensionHeight', 'rearSuspensionHeight', 'rearLeftTyrePressure', 'rearRightTyrePressure',
+# 'frontLeftTyrePressure', 'frontRightTyrePressure', 'ballast', 'brakePressure', 'brakeBias', # carSetup
 'fuelMix', 'fuelInTank', 'tyresWear', 'tyreCompound', 'tyresAgeLaps', # carStatus
-'lastLapTime', 'currentLapNum' # lapData
+'lastLapTime', 'currentLapNum', 'setUpName' # lapData
+]
+
+headerSetUp = ['trackName', 'frontWing', 'rearWing', 'onThrottle', 'offThrottle', 'frontCamber', 'rearCamber', 'frontToe', 'rearToe', 'frontSuspension',
+'rearSuspension', 'frontAntiRollBar', 'rearAntiRollBar', 'frontSuspensionHeight', 'rearSuspensionHeight', 'rearLeftTyrePressure', 'rearRightTyrePressure',
+'frontLeftTyrePressure', 'frontRightTyrePressure', 'ballast', 'brakePressure', 'brakeBias', 'setUpName'
 ]
 
 track = {
@@ -74,6 +81,39 @@ def getData():
                 line_count += 1
     return lapData
 
+def getSetUp():
+    allSetUp = []
+    with open('MLPython/Lap_project/Set_up.csv') as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        line_count = 0
+        for row in csv_reader:
+            if line_count != 0:
+                allSetUp.append(row)
+                line_count += 1
+            else:
+                line_count += 1
+    return allSetUp
+
+def newSetUp(allSetUp, usedSetUp): # devo passargli il set up che ho usato nel 'main' 
+    setUpName = usedSetUp[0] + '001'
+    for setUp in allSetUp:
+        check =  all(item in setUp for item in usedSetUp)
+        if check is False:
+            # nuovo SetUp, aggiorna il nome del setup
+            
+            allSetUp.append(usedSetUp)
+            writeSetUp(allSetUp)
+
+def writeSetUp(data):
+    with open('MLPython/Lap_project/Set_up.csv', 'w', encoding='UTF8', newline='') as f:
+        writer = csv.writer(f)
+
+        # write the header
+        writer.writerow(headerSetUp)
+
+        # write the data
+        writer.writerows(data)
+
 def cleanData(data):
     for lap in data:
         lap[1] = track[lap[1]]
@@ -91,8 +131,20 @@ def writeData(lapData):
         writer.writerow(header)
 
         # write the data
-        writer.writerows(lapData)
+        toWrite = []
+        for data in lapData:
+            toWrite.append(data[0:6] + data[27:34])
+        writer.writerows(toWrite)
 
 data = getData()
 readableData = cleanData(data)
+
+allSetUp = getSetUp()
+for setUp in readableData:
+    usedSetUp = setUp[6:27]
+    usedSetUp.insert(0,setUp[1])
+    for item in allSetUp:
+        if(setUp[1] == item[0]):
+            newSetUp(allSetUp, usedSetUp)
+
 writeData(readableData)
