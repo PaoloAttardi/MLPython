@@ -1,7 +1,5 @@
 import csv
 
-from pyparsing import empty
-
 header = ['sessionUID','trackName','sessionType','weather','trackTemperaure','airTemperature', # sessionData
 # 'frontWing', 'rearWing', 'onThrottle', 'offThrottle', 'frontCamber', 'rearCamber', 'frontToe', 'rearToe', 'frontSuspension',
 # 'rearSuspension', 'frontAntiRollBar', 'rearAntiRollBar', 'frontSuspensionHeight', 'rearSuspensionHeight', 'rearLeftTyrePressure', 'rearRightTyrePressure',
@@ -79,7 +77,7 @@ def getData():
                 line_count += 1
             else:
                 line_count += 1
-    return lapData
+    return lapData[0]
 
 def getSetUp():
     allSetUp = []
@@ -94,15 +92,15 @@ def getSetUp():
                 line_count += 1
     return allSetUp
 
-def newSetUp(allSetUp, usedSetUp): # devo passargli il set up che ho usato nel 'main' 
-    setUpName = usedSetUp[0] + '001'
-    for setUp in allSetUp:
-        check =  all(item in setUp for item in usedSetUp)
+def newSetUp(trackSetUp, usedSetUp):
+    if trackSetUp == []:
+        num = '100'
+    else:
+        check =  all(item in trackSetUp for item in usedSetUp) # controllare se l'ordine track/used è corretto
         if check is False:
-            # nuovo SetUp, aggiorna il nome del setup
-            
-            allSetUp.append(usedSetUp)
-            writeSetUp(allSetUp)
+            lastSetUp = trackSetUp[len(trackSetUp) - 1]
+            num = lastSetUp[len(lastSetUp) - 1][-3:]  
+    return usedSetUp[0] + num
 
 def writeSetUp(data):
     with open('MLPython/Lap_project/Set_up.csv', 'w', encoding='UTF8', newline='') as f:
@@ -115,12 +113,11 @@ def writeSetUp(data):
         writer.writerows(data)
 
 def cleanData(data):
-    for lap in data:
-        lap[1] = track[lap[1]]
-        lap[2] = sessionType[lap[2]]
-        lap[3] = weather[lap[3]]
-        lap[27] = fuelMix[lap[27]]
-        lap[30] = tyreCompound[lap[30]]
+    data[1] = track[data[1]]
+    data[2] = sessionType[data[2]]
+    data[3] = weather[data[3]]
+    data[27] = fuelMix[data[27]]
+    data[30] = tyreCompound[data[30]]
     return data
 
 def writeData(lapData):
@@ -136,15 +133,24 @@ def writeData(lapData):
             toWrite.append(data[0:6] + data[27:34])
         writer.writerows(toWrite)
 
-data = getData()
-readableData = cleanData(data)
+def main():
+    data = getData()
+    readableData = cleanData(data)
 
-allSetUp = getSetUp()
-for setUp in readableData:
-    usedSetUp = setUp[6:27]
-    usedSetUp.insert(0,setUp[1])
+    allSetUp = getSetUp()
+    trackSetUp = []
+    usedSetUp = readableData[6:27]
+    usedSetUp.insert(0,readableData[1])
     for item in allSetUp:
-        if(setUp[1] == item[0]):
-            newSetUp(allSetUp, usedSetUp)
+        if(readableData[1] == item[0]):
+            trackSetUp.append(item)
+    setUpName = newSetUp(trackSetUp, usedSetUp)
+    usedSetUp.append(setUpName)
+    readableData.append(setUpName)
+    allSetUp.append(usedSetUp)
+    print(allSetUp)
+    print(readableData)
+    # writeSetUp(allSetUp)
+    # writeData(readableData) prima leggi il file e dopo scrivi
 
-writeData(readableData)
+main()
