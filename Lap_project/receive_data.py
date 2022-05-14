@@ -1,4 +1,6 @@
 import socket
+from time import sleep
+import data_cleaning
 import csv
 import numpy as np
 from threading import Thread
@@ -100,6 +102,7 @@ def GetLapData(packet):
     currentLapNum = myCar.currentLapNum
     global lastLapNum
     if(currentLapNum > lastLapNum):
+        sleep(2)
         global data
         lastLapNum = currentLapNum
         lapData = [lastLapTime, currentLapNum]
@@ -118,7 +121,6 @@ def WriteData(data):
                 line_count += 1
             else:
                 line_count += 1
-    print(data)
     if(data != None): lapData.append(data[0] + data[1] + data[2] + data[3])
     with open('MLPython/Lap_project/Lap_time.csv', 'w', encoding='UTF8', newline='') as f:
         writer = csv.writer(f)
@@ -128,6 +130,7 @@ def WriteData(data):
 
         # write the data
         writer.writerows(lapData)
+    data_cleaning.main()
 
 def userInput():
     print('Digita "n" per fermare la raccolta dati: ')

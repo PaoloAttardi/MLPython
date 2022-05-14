@@ -79,6 +79,19 @@ def getData():
                 line_count += 1
     return lapData[0]
 
+def getReadableData():
+    allData = []
+    with open('MLPython/Lap_project/Readable_lap_time.csv') as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        line_count = 0
+        for row in csv_reader:
+            if line_count != 0:
+                allData.append(row)
+                line_count += 1
+            else:
+                line_count += 1
+    return allData
+
 def getSetUp():
     allSetUp = []
     with open('MLPython/Lap_project/Set_up.csv') as csv_file:
@@ -96,11 +109,16 @@ def newSetUp(trackSetUp, usedSetUp):
     if trackSetUp == []:
         num = '100'
     else:
+        lastSetUp = trackSetUp[len(trackSetUp) - 1]
+        nameLastSetUp = lastSetUp[len(lastSetUp) - 1]
+        usedSetUp[0].append(nameLastSetUp)
         check =  all(item in trackSetUp for item in usedSetUp) # controllare se l'ordine track/used è corretto
         if check is False:
-            lastSetUp = trackSetUp[len(trackSetUp) - 1]
-            num = lastSetUp[len(lastSetUp) - 1][-3:]  
-    return usedSetUp[0] + num
+            usedSetUp[0].pop()
+            num = int(nameLastSetUp[-3:])  + 1
+        else:
+            return nameLastSetUp,False
+    return usedSetUp[0][0] + str(num),True
 
 def writeSetUp(data):
     with open('MLPython/Lap_project/Set_up.csv', 'w', encoding='UTF8', newline='') as f:
@@ -121,6 +139,7 @@ def cleanData(data):
     return data
 
 def writeData(lapData):
+    toWrite = getReadableData()
     with open('MLPython/Lap_project/Readable_lap_time.csv', 'w', encoding='UTF8', newline='') as f:
         writer = csv.writer(f)
 
@@ -128,9 +147,7 @@ def writeData(lapData):
         writer.writerow(header)
 
         # write the data
-        toWrite = []
-        for data in lapData:
-            toWrite.append(data[0:6] + data[27:34])
+        toWrite.append(lapData[0:6] + lapData[27:35])
         writer.writerows(toWrite)
 
 def main():
@@ -139,18 +156,17 @@ def main():
 
     allSetUp = getSetUp()
     trackSetUp = []
-    usedSetUp = readableData[6:27]
-    usedSetUp.insert(0,readableData[1])
+    usedSetUp = []
+    usedSetUp.append(readableData[6:27])
+    usedSetUp[0].insert(0,readableData[1])
     for item in allSetUp:
         if(readableData[1] == item[0]):
             trackSetUp.append(item)
-    setUpName = newSetUp(trackSetUp, usedSetUp)
-    usedSetUp.append(setUpName)
+    setUpName,new = newSetUp(trackSetUp, usedSetUp)
     readableData.append(setUpName)
-    allSetUp.append(usedSetUp)
-    print(allSetUp)
-    print(readableData)
-    # writeSetUp(allSetUp)
-    # writeData(readableData) prima leggi il file e dopo scrivi
-
-main()
+    usedSetUp[0].append(setUpName)
+    allSetUp.append(usedSetUp[0])
+    if new is True:
+        writeSetUp(allSetUp)
+    writeData(readableData)
+    open('MLPython/Lap_project/Lap_time.csv', 'w').close()
