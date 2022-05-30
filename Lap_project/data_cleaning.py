@@ -1,11 +1,8 @@
 import csv
 
 header = ['sessionUID','trackName','sessionType','weather','trackTemperaure','airTemperature', # sessionData
-# 'frontWing', 'rearWing', 'onThrottle', 'offThrottle', 'frontCamber', 'rearCamber', 'frontToe', 'rearToe', 'frontSuspension',
-# 'rearSuspension', 'frontAntiRollBar', 'rearAntiRollBar', 'frontSuspensionHeight', 'rearSuspensionHeight', 'rearLeftTyrePressure', 'rearRightTyrePressure',
-# 'frontLeftTyrePressure', 'frontRightTyrePressure', 'ballast', 'brakePressure', 'brakeBias', # carSetup
 'fuelMix', 'fuelInTank', 'tyresWear', 'tyreCompound', 'tyresAgeLaps', # carStatus
-'lastLapTime', 'currentLapNum', 'setUpName' # lapData
+'lastLapTime', 'currentLapNum', 'position', 'setUpName' # lapData
 ]
 
 headerSetUp = ['trackName', 'frontWing', 'rearWing', 'onThrottle', 'offThrottle', 'frontCamber', 'rearCamber', 'frontToe', 'rearToe', 'frontSuspension',

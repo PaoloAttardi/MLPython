@@ -11,7 +11,7 @@ header = ['sessionUID','trackId','sessionType','weather','trackTemperaure','airT
 'rearSuspension', 'frontAntiRollBar', 'rearAntiRollBar', 'frontSuspensionHeight', 'rearSuspensionHeight', 'rearLeftTyrePressure', 'rearRightTyrePressure',
 'frontLeftTyrePressure', 'frontRightTyrePressure', 'ballast', 'brakePressure', 'brakeBias', # carSetup
 'fuelMix', 'fuelInTank', 'tyresWear', 'actualTyreCompound', 'tyresAgeLaps', # carStatus
-'lastLapTime', 'currentLapNum' # lapData
+'lastLapTime', 'currentLapNum', 'position' # lapData
 ]
 playerCarId = None
 lastLapNum = 1
@@ -98,12 +98,13 @@ def GetLapData(packet):
     myCar = packet.lapData[playerCarId]
     lastLapTime = myCar.lastLapTime
     currentLapNum = myCar.currentLapNum
+    carPosition = myCar.carPosition
     global lastLapNum
     if(currentLapNum > lastLapNum):
-        sleep(2)
+        sleep(1)
         global data
         lastLapNum = currentLapNum
-        lapData = [lastLapTime, currentLapNum]
+        lapData = [lastLapTime, currentLapNum, carPosition]
         data[3] = lapData
         write_data_thread = Thread(target=WriteData,args=(data,))
         write_data_thread.start()
