@@ -91,8 +91,6 @@ def GetCarStatus(packet):
     tyresWear = np.sum(tyresWear)/4 # General Wear
     actualTyreCompound = myCar.actualTyreCompound
     tyresAgeLaps = myCar.tyresAgeLaps
-    # if(tyresAgeLaps == 0): tyresAgeLaps += 1
-    # elif(tyresAgeLaps == 1): tyresAgeLaps +=1
     carStatusData = [fuelMix, fuelInTank, tyresWear, actualTyreCompound, tyresAgeLaps]
     return carStatusData
 
@@ -138,6 +136,11 @@ def userInput():
     if (input_check == 'n'):
         global stop_threads
         stop_threads = True
+        hostname = socket.gethostname()    
+        IPAddr = socket.gethostbyname(hostname)  
+        UDP_PORT = 20777
+        stop_socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
+        stop_socket.sendto(b'hi', (IPAddr, UDP_PORT))
 
 """
 The Thread() accepts many parameters. The main ones are:

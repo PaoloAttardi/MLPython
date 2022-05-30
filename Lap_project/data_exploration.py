@@ -31,7 +31,9 @@ for lapTime in df['lastLapTime']:
     result.append(secondToLapTime(lapTime))
 
 df['LapTime'] = result
-sns.relplot(data=df, x='currentLapNum', y='lastLapTime', col='sessionUID', hue='tyreCompound', kind='line').fig.suptitle('Laps Time')
+sns.relplot(data=df, x='currentLapNum', y='lastLapTime', col='sessionUID', hue='tyreCompound', kind='line')
+
+sns.relplot(data=df, x='tyresAgeLaps', y='lastLapTime', col='setUpName', hue='tyreCompound')
 
 sns.relplot(data=df, x='tyresAgeLaps', y='tyresWear', col='tyreCompound', kind='line').fig.suptitle('Tyres Wear')
 
