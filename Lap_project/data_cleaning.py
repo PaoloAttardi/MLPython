@@ -144,7 +144,7 @@ def writeData(lapData):
         writer.writerow(header)
 
         # write the data
-        toWrite.append(lapData[0:6] + lapData[27:35])
+        toWrite.append(lapData[0:6] + lapData[27:36])
         writer.writerows(toWrite)
 
 def main():
