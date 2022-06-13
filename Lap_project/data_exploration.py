@@ -1,7 +1,6 @@
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-from math import modf
 import numpy as np
 
 def meanLapTime(session):
@@ -27,7 +26,7 @@ sns.relplot(data=df, x='tyresAgeLaps', y='tyresWear', col='setUpName', hue='tyre
 
 plt.show()
 
-sns.relplot(data=df, x='fuelInTank', y='lastLapTime')
+sns.relplot(data=df, x='fuelInTank', y='lastLapTime', col='setUpName')
 
 plt.gca().invert_xaxis()
 
