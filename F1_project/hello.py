@@ -1,12 +1,8 @@
 import fastf1 as ff1
-from fastf1 import plotting
 from fastf1 import utils
 
 from matplotlib import pyplot as plt
-from matplotlib.pyplot import figure
 
-import numpy as np
-import pandas as pd
 import seaborn as sns
 
 ff1.Cache.enable_cache('cache')
