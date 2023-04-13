@@ -34,5 +34,6 @@ p_test = model.predict(X_test)
 mae_train = mean_absolute_error(y_train, p_train)
 mae_test = mean_absolute_error(y_test, p_test)
 
+print(f'{p_test}')
 print(f'Median cnt {np.median(y)}')
 print(f'Train {mae_train}, test {mae_test}')

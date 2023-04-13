@@ -65,7 +65,7 @@ fuelMix = {
 
 def getData():
     lapData = []
-    with open('MLPython/Lap_project/Lap_time.csv') as csv_file:
+    with open('C:/Users/Computer/Documents/GitHub/MLPython/Lap_project/Lap_time.csv') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         line_count = 0
         for row in csv_reader:
@@ -78,7 +78,7 @@ def getData():
 
 def getReadableData():
     allData = []
-    with open('MLPython/Lap_project/Readable_lap_time.csv') as csv_file:
+    with open('C:/Users/Computer/Documents/GitHub/MLPython/Lap_project/Readable_lap_time.csv') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         line_count = 0
         for row in csv_reader:
@@ -91,7 +91,7 @@ def getReadableData():
 
 def getSetUp():
     allSetUp = []
-    with open('MLPython/Lap_project/Set_up.csv') as csv_file:
+    with open('C:/Users/Computer/Documents/GitHub/MLPython/Lap_project/Set_up.csv') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         line_count = 0
         for row in csv_reader:
@@ -118,7 +118,7 @@ def newSetUp(trackSetUp, usedSetUp):
     return usedSetUp[0][0] + str(num),True
 
 def writeSetUp(data):
-    with open('MLPython/Lap_project/Set_up.csv', 'w', encoding='UTF8', newline='') as f:
+    with open('C:/Users/Computer/Documents/GitHub/MLPython/Lap_project/Set_up.csv', 'w', encoding='UTF8', newline='') as f:
         writer = csv.writer(f)
 
         # write the header
@@ -137,7 +137,7 @@ def cleanData(data):
 
 def writeData(lapData):
     toWrite = getReadableData()
-    with open('MLPython/Lap_project/Readable_lap_time.csv', 'w', encoding='UTF8', newline='') as f:
+    with open('C:/Users/Computer/Documents/GitHub/MLPython/Lap_project/Readable_lap_time.csv', 'w', encoding='UTF8', newline='') as f:
         writer = csv.writer(f)
 
         # write the header
@@ -166,4 +166,4 @@ def main():
     if new is True:
         writeSetUp(allSetUp)
     writeData(readableData)
-    open('MLPython/Lap_project/Lap_time.csv', 'w').close()
+    open('C:/Users/Computer/Documents/GitHub/MLPython/Lap_project/Lap_time.csv', 'w').close()

@@ -111,7 +111,7 @@ def GetLapData(packet):
 
 def WriteData(data):
     lapData = []
-    with open('MLPython/Lap_project/Lap_time.csv') as csv_file:
+    with open('C:/Users/Computer/Documents/GitHub/MLPython/Lap_project/Lap_time.csv') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         line_count = 0
         for row in csv_reader:
@@ -121,7 +121,7 @@ def WriteData(data):
             else:
                 line_count += 1
     if(data != None): lapData.append(data[0] + data[1] + data[2] + data[3])
-    with open('MLPython/Lap_project/Lap_time.csv', 'w', encoding='UTF8', newline='') as f:
+    with open('C:/Users/Computer/Documents/GitHub/MLPython/Lap_project/Lap_time.csv', 'w', encoding='UTF8', newline='') as f:
         writer = csv.writer(f)
 
         # write the header

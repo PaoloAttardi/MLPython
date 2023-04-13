@@ -1,6 +1,6 @@
 import fastf1 as ff1
 from fastf1 import utils
-
+from fastf1 import plotting
 from matplotlib import pyplot as plt
 
 import seaborn as sns
@@ -9,8 +9,8 @@ ff1.Cache.enable_cache('cache')
 
 def telemetry():
 
-    year, grand_prix, session = 2022, 'Belgium', 'Practice 1'
-    driver_1, driver_2, driver_3, driver_4  = 'VER', 'LEC', 'VER', 'PER'
+    year, grand_prix, session = 2023, 'Bahrain', 'Practice 1'
+    driver_1, driver_2, driver_3, driver_4  = 'PER', 'SAI', 'VER', 'PER'
 
     quali = ff1.get_session(year, grand_prix, session)
     quali.load()
@@ -124,4 +124,4 @@ def race1():
     """
     
     plt.show()
-race1()
+telemetry()

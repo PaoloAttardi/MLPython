@@ -10,7 +10,7 @@ def meanLapTime(session):
             lapTime.append(df['lastLapTime'])
     return np.mean(lapTime)
 
-df = pd.read_csv('MLPython/Lap_project/Readable_lap_time.csv')
+df = pd.read_csv('../MLPython/Lap_project/Readable_lap_time.csv')
 
 session = df['sessionUID'][0]
 
