@@ -101,27 +101,32 @@ def telemetry():
 
 def race1():
 
-    year, grand_prix, session = 2022, 'Italy', 'Race'
-    driver_1,driver_2 = 'LEC', 'RUS'
+    year, grand_prix, session = 2023, 'Canada', 'Race'
+    driver_1,driver_2 = 'LEC','HAM'
+    drivers = [driver_1, driver_2]
 
     race = ff1.get_session(year, grand_prix, session)
     race.load()
 
-    laps = race.load_laps().pick_drivers([driver_1,driver_2])
-
+    laps = race.load_laps().pick_drivers([driver_1, driver_2])
+    
     laps = laps.pick_track_status('1')
-
+    # To get accurate laps only, we exclude in- and outlaps
+    laps = laps.loc[(laps['PitOutTime'].isnull() & laps['PitInTime'].isnull())]
+    
     # Convert laptimes to seconds
     laps['LapTimeSeconds'] = laps['LapTime'].dt.total_seconds()
+    for driver in drivers:
+        dlaps = laps[laps['Driver'] == driver]
+        stints = dlaps['Stint'].unique()
+        for stint in stints:
+            mean = dlaps[dlaps['Stint'] == stint]['LapTimeSeconds'].mean()
+            plt.title(f'Stint number {stint} for {driver} with mean: {round(mean, ndigits=2)}')
+            sns.lineplot(x='LapNumber', y='LapTimeSeconds', data=dlaps[dlaps['Stint'] == stint], marker='.')
+            plt.show()
 
     sns.lineplot(x='LapNumber', y='LapTimeSeconds', data=laps, hue='Driver', marker='.')
-
-    """
-    laps_1 = laps.loc[laps['Driver'] == driver_1]['LapTimeSeconds'].tolist()
-    laps_2 = laps.loc[laps['Driver'] == driver_2]['LapTimeSeconds'].tolist()
-    LapTime = laps['LapNumber'].tolist()
-    plt.fill_between(LapTime, laps_1, laps_2, alpha="0.3")
-    """
-    
     plt.show()
-telemetry()
+    sns.boxplot(data=laps, x='Driver', y='LapTimeSeconds', showmeans=True)
+    plt.show()
+race1()

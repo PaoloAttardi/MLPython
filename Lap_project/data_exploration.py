@@ -19,15 +19,15 @@ timeLimit = meanLapTime(session) + 4
 df = df[df['lastLapTime'] < timeLimit]
 
 sns.relplot(data=df, x='currentLapNum', y='lastLapTime', col='sessionUID', hue='tyreCompound', kind='line')
-
-sns.relplot(data=df, x='tyresAgeLaps', y='lastLapTime', col='setUpName', hue='tyreCompound')
-
-sns.relplot(data=df, x='tyresAgeLaps', y='tyresWear', col='setUpName', hue='tyreCompound', kind='line').fig.suptitle('Tyres Wear')
-
 plt.show()
 
-sns.relplot(data=df, x='fuelInTank', y='lastLapTime', col='setUpName')
+sns.boxplot(data=df, x='tyreCompound', y='lastLapTime', showmeans=True)
+plt.show()
 
+sns.relplot(data=df, x='tyresAgeLaps', y='tyresWear', hue='tyreCompound', kind='line')
+plt.title('Tyres Wear')
+plt.show()
+
+sns.relplot(data=df, x='fuelInTank', y='lastLapTime', col='setUpName', kind='line', markers='.')
 plt.gca().invert_xaxis()
-
 plt.show()
