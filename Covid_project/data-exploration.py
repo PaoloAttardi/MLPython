@@ -3,7 +3,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 
-df = pd.read_csv('MLPython/Covid_project/data_download_file_reference_2022.csv')
+df = pd.read_csv('Covid_project/data_download_file_reference_2022.csv')
 # stat = df.describe()
 
 # il df permette tre diverse 'predizioni' una a bassa diffusione una a media e una ad alta diffusione del virus, si prende in esempio la media diffusione
@@ -20,7 +20,8 @@ df = filtered.get([
     'infection_fatality','infection_detection','infection_hospitalization'
 ])
 
-sns.relplot(data=df, x='cumulative_all_fully_vaccinated', y='daily_cases', kind='line')
-sns.relplot(data=df, x='cumulative_all_fully_vaccinated', y='daily_deaths', kind='line')
+# sns.relplot(data=df, x='cumulative_all_fully_vaccinated', y='daily_cases', kind='line')
+# sns.relplot(data=df, x='daily_cases', y='daily_deaths', hue='cumulative_all_fully_vaccinated')
+print(df['cumulative_all_fully_vaccinated'][10918])
 
 plt.show()
